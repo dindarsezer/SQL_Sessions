@@ -69,6 +69,23 @@ CREATE TABLE Person.Person_Mail
 	);
 
 
+/* tabloyu create ederken foreign keyi bu þekilde atayabiliriz
+
+CREATE TABLE Person.Person_Mail
+	(
+	Mail_ID INT PRIMARY KEY IDENTITY (1,1),
+	Mail NVARCHAR(MAX) NOT NULL,
+	SSN BIGINT UNIQUE NOT NULL	
+	FOREIGN KEY (SSN) REFERENCES person.person (SSN)
+	);
+
+*/
+
+
+
+
+
+
 --Tablolarý yukarýdaki þekilde öncelikle create edip devam ediniz.
 --Aþaðýda DML komutlarýný örneklendirip tablo constraintlerini sonradan tanýmlayacaðýz. 
 --Örnek olarak insert ettiðimiz verileri sonradan sileceðiz. 
@@ -229,9 +246,9 @@ TRUNCATE TABLE Book.Publisher;
 
 -- Foreign key constraint' leri belirlememiz gerekiyor
 
-ALTER TABLE Book.Book ADD CONSTRAINT FK_Author FOREIGN KEY (Author_ID) REFERENCES Book.Author (Author_ID)
+ALTER TABLE Book.Book ADD CONSTRAINT FK_Author FOREIGN KEY (Author_id) REFERENCES Book.Author (Author_ID)
 
-ALTER TABLE Person.Book ADD CONSTRAINT FK_Publisher FOREIGN KEY (Publisher_ID) REFERENCES Book.Publisher (Publisher_ID)
+ALTER TABLE book.Book ADD CONSTRAINT FK_Publisher FOREIGN KEY (Publisher_id) REFERENCES Book.Publisher (Publisher_ID)
 
 ---------Author
 
@@ -261,7 +278,7 @@ ON UPDATE NO ACTION
 ON DELETE NO ACTION
 
 
-ALTER TABLE Person.Loan ADD CONSTRAINT FK_book FOREIGN KEY (Book_ID) REFERENCES Book.Book (Book_ID)
+ALTER TABLE Person.Loan ADD CONSTRAINT FK_book FOREIGN KEY (Book_ID) REFERENCES Book.Book (Book_id)
 ON UPDATE NO ACTION
 ON DELETE CASCADE
 
