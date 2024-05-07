@@ -3,9 +3,9 @@
 ---JOINS
 
 --INNER JOIN
+--Her iki tablodaki eþleþen kayýtlarý (kesiþim kümesi) bize getirir
 
 -- Make a list of products showing the product ID, product name, category ID, and category name.
-
 
 SELECT	product_id, product_name, product.category.category_id, product.category.category_name
 FROM	product.product
@@ -14,14 +14,11 @@ FROM	product.product
 		ON product.product.category_id = product.category.category_id
 
 
-
 SELECT	product_id, product_name, pc.category_id, pc.category_name
 FROM	product.product AS pp
 		INNER JOIN
 		product.category AS pc
 		ON pp.category_id = pc.category_id
-
-
 
 
 SELECT	product_id, product_name, pc.category_id, pc.category_name
@@ -33,7 +30,7 @@ FROM	product.product AS pp
 
 
 --List employees of stores with their store information.
-
+--Maðaza çalýþanlarýný maðaza bilgileriyle birlikte listeleyin.
 --Select first name, last name, store name
 
 
@@ -44,18 +41,17 @@ FROM	sale.staff AS A
 		ON	A.store_id = B.store_id
 
 
-
 ------ LEFT JOIN ------
+--Ýki tabloda ilk verilen tablonun sütunundaki ki tüm verileri, diðer tabloda ise sadece eþleþenleri getirir
 
---Write a query that returns products that have never been ordered
+--Hiç sipariþ edilmemiþ ürünleri döndüren bir sorgu yazýn
 --Select product ID, product name, orderID
 
-
-SELECT COUNT(product_id)
+SELECT COUNT(product_id) -- product tablosundaki sipariþler
 FROM	product.product
 
 
-SELECT COUNT(DISTINCT product_id)
+SELECT COUNT(DISTINCT product_id) -- order_item tablosundaki sipariþler
 FROM	sale.order_item
 
 
@@ -70,17 +66,17 @@ WHERE	B.order_id IS NULL
 
 ------////////
 
---Report the stock status of the products that product id greater than 310 in the stores.
+--Ürün kimliði 310'dan büyük olan ürünlerin maðazalardaki stok durumunu raporlayýn.
 --Expected columns: product_id, product_name, store_id, product_id, quantity
 
 
 SELECT *
-FROM	product.product
+FROM	product.product		-- product ta 310 dan büyük ürünler
 WHERE	product_id > 310
 
 
 
-SELECT	COUNT(DISTINCT product_id)
+SELECT	COUNT(DISTINCT product_id)-- stock tablosunda 310 dan büyük ürünler
 FROM	product.stock
 WHERE	product_id > 310
 
@@ -113,15 +109,12 @@ WHERE	A.product_id > 310
 ----------------------
 
 
---RIGHT JOIN
+--RIGHT JOIN------////////
+--Ýki tabloda ilk verilen tablonun sütununda kesiþimde olanlarý Ýkinci verilen tablo sütunundaki tüm deðerleri getirir.
 
-------////////
 
---Report the stock status of the products that product id greater than 310 in the stores.
+--Ürün kimliði 310'dan büyük olan ürünlerin maðazalardaki stok durumunu raporlayýn.
 --Expected columns: product_id, product_name, store_id, product_id, quantity
-
-
-
 
 
 SELECT	B.product_id, B.product_name, A.*
@@ -134,10 +127,7 @@ WHERE	B.product_id > 310
 
 -----------
 
-
---//////
-
----Report the order information made by all staffs.
+---Tüm personel tarafýndan yapýlan sipariþ bilgilerinin raporlanmasý
 
 --Expected columns: staff_id, first_name, last_name, all the information about orders
 
@@ -147,7 +137,6 @@ FROM	sale.orders
 
 SELECT	COUNT (DISTINCT staff_id)
 FROM	sale.staff
-
 
 
 SELECT	B.staff_id, B.first_name, B.last_name, A.*
@@ -160,9 +149,9 @@ ORDER BY
 
 
 ------ FULL OUTER JOIN ------
+--Her iki tabloda istenen sütundaki tüm satýrlar gelir eþleþmeyenler NULL olur
 
---Write a query that returns stock and order information together for all products . Return only top 100 rows.
-
+--Tüm ürünler için stok ve sipariþ bilgilerini birlikte döndüren bir sorgu yazýn. Yalnýzca ilk 100 satýrý döndürün.
 --Expected columns: Product_id, store_id, quantity, order_id, list_price
 
 
@@ -179,7 +168,7 @@ ORDER BY
 
 
 ------ CROSS JOIN ------
-
+--Ýki tabloda verilen sütunlardaki her deðer için diðer tablodaki her deðere ayný deðeri atar 
 
 SELECT	A.brand_name, B.category_name
 FROM	product.brand AS A
@@ -189,12 +178,8 @@ FROM	product.brand AS A
 
 
 /*
-In the stocks table, there are not all products held on the product table and you want to insert these products into the stock table.
-
-You have to insert all these products for every three stores with “0 (zero)” quantity.
-
-Write a query to prepare this data.
-
+Stoklar tablosunda, ürün tablosunda tutulan tüm ürünler yok ve bu ürünleri stok tablosuna eklemek istiyorsunuz.
+Tüm bu ürünleri her üç maðaza için "0 (sýfýr)" miktar ile eklemeniz gerekir.
 */
 
 
@@ -208,7 +193,6 @@ ORDER BY
 
 
 /*
-
 INSERT product.stock
 SELECT	B.store_id, A.product_id, 0 AS quantity
 FROM	product.product AS A
@@ -220,11 +204,9 @@ ORDER BY
 */
 
 
-
-
 ------ SELF JOIN ------
 
---Write a query that returns the staff names with their manager names.
+--Personel adlarýný yönetici adlarýyla birlikte döndüren bir sorgu yazýn
 --Expected columns: staff first name, staff last name, manager name
 
 SELECT	A.first_name AS manager_name, B.first_name AS staff_name
@@ -241,23 +223,10 @@ FROM	sale.staff AS A
 		ON A.manager_id = B.staff_id
 
 
---//////
-
---Write a query that returns both the names of staff and the names of their 1st and 2nd managers
-
--- Bir önceki sorgu sonucunda gelen þeflerin yanýna onlarýn da þeflerini getiriniz
--- Çalýþan adý, þef adý, þefin þefinin adý bilgilerini getirin
-
-
-
-
-
-
-
-
---------------///////////////
 
 -----VIEWS
+--Doðrudan database tablolarý yerine oluþturulan views ler ile çalýþýlýr. Bütün tablo sistemi yorar.
+--Views ler tablolara baðlý olarak oluþturulan sanal tablolardýr.
 ;GO
 
 CREATE VIEW customer_after_2019 AS
