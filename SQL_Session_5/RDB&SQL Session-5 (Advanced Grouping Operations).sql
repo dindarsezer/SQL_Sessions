@@ -14,6 +14,11 @@ ORDER BY	: Sonuç tablosunu hangi sýralama ile getireyim.
 
 */
 
+--Model yýlý 2016 dan büyük olan marka(brand) larý – marka ismine(brand_name) göre grupla,
+--ortalama liste fiyatlarý[AVG(list_price)] 1000 den büyük olanlarý,
+--brand_name ve avg_list_price adý altýnda iki sütunu getir,
+--bunlarý AVG(list_price) a göre artan sýrada sýrala
+
 SELECT brand_name, AVG(list_price) AS avg_list_price
 FROM product.product A, product.brand B
 WHERE A.brand_id = B.brand_id
@@ -33,10 +38,8 @@ HAVING AVG(list_price) > 1000
 ORDER BY AVG(list_price) ASC; 
 
 
---HAVING
-
-
---Write a query that checks if any product id is duplicated in product table.
+----1-HAVING---------------------------------------------------------------------------------
+--GROUP BY ile gruplanan tabloda, gruplarý belirli bir koþula göre filtreleme yapmamýzýz saðlar
 
 ----product tablosunda herhangi bir product id' nin çoklayýp çoklamadýðýný kontrol ediniz.
 
@@ -58,10 +61,6 @@ GROUP BY product_id
 HAVING COUNT(product_id) > 1;
 
 
---///////
-
---Write a query that returns category ids with conditions max list price above 4000 or a min list price below 500.
-
 --maximum list price' ý 4000' in üzerinde olan veya minimum list price' ý 500' ün altýnda olan categori id' leri getiriniz
 --category name' e gerek yok.
 
@@ -71,17 +70,11 @@ FROM product.product
 ORDER BY category_id, list_price;
 
 
-
 SELECT category_id, MAX(list_price) AS max_price, MIN(list_price) AS min_price
 FROM product.product
 GROUP BY category_id
 HAVING MAX(list_price) > 4000 OR MIN(list_price) < 500;
 
-
-
----/////
-
---Find the average product prices of the brands. Display brand name and average prices in descending order.
 
 --Markalara ait ortalama ürün fiyatlarýný bulunuz.
 --ortalama fiyatlara göre azalan sýrayla gösteriniz.
@@ -115,13 +108,7 @@ GROUP BY
 ORDER BY 2 DESC;
 
 
---////
-
-
---Write a query that returns the list of brands whose average product prices are more than 1000
-
 ---ortalama ürün fiyatý 1000' den yüksek olan MARKALARI getiriniz
-
 
 SELECT brand_name, AVG(A.list_price) AVG_PRICE
 FROM product.product A
@@ -135,16 +122,8 @@ HAVING AVG(A.list_price) > 1000
 ORDER BY 2 DESC;
 
 
-
---////////
-
---Write a query that returns the list of each order id and that order's total net price 
---(please take into consideration of discounts and quantities)
-
-
 --bir sipariþin toplam net tutarýný getiriniz. (müþterinin sipariþ için ödediði tutar)
 --discount' ý ve quantity' yi ihmal etmeyiniz.
-
 
 SELECT *
 FROM sale.orders;
@@ -152,11 +131,8 @@ FROM sale.orders;
 SELECT *
 FROM sale.order_item;
 
-
 SELECT order_id, product_id, quantity * list_price * (1-discount)  AS net_price
 FROM sale.order_item;
-
-
 
 SELECT order_id, product_id, SUM(quantity * list_price * (1-discount))  AS net_price
 FROM sale.order_item
@@ -169,9 +145,6 @@ FROM sale.order_item
 GROUP BY order_id
 ORDER BY order_id;
 
-------------------/////////////////
-
---Write a query that returns monthly order counts of the States.
 
 --State' lerin aylýk sipariþ sayýlarýný hesaplayýnýz
 
@@ -203,25 +176,21 @@ FROM sale.customer A
 	INNER JOIN
 	sale.orders B
 	ON A.customer_id = B.customer_id
-GROUP BY state, YEAR(B.order_date), MONTH(B.order_date)
+GROUP BY [state], YEAR(B.order_date), MONTH(B.order_date)
 ORDER BY 1,2,3;
 
---///////////////////////////
 
---Just now, we're gonna create a summary table for following topics 
-
+--Þimdi, aþaðýdaki konular için bir özet tablo oluþturacaðýz 
 --Summary Table
-
 
 --we are going to use SELECT * INTO .... FROM ... instruction
 
 --SYNTAX
-
+--ÝNTO ile yeni bir tablo oluþtururuz
 SELECT * 
 INTO	NEW_TABLE
 FROM	SOURCE_TABLE
 WHERE ...
-
 
 --Anyway, we create summary table
 
@@ -240,9 +209,11 @@ GROUP BY
 SELECT *
 FROM sale.sales_summary;
 
------///////////////////////------
 
---GRUPING SETS
+------2-GRUPING SETS------------------------------------------------------------------------------------------------------------------
+--Anlamlý özet istatistiklere ulaþmak için gruplama setlerini kullanabiliriz.
+--GROUPING SETS operatörü, ayný sorguda farklý gruplama düzeylerinde toplamalar elde etmek ve
+--çok yönlü raporlar oluþturmak için kullanýlan bir SQL özelliðidir.
 
 /*SORU 1. Calculate the total sales price of each brands.
 TR - 1. Her markanýn toplam satýþ miktarýný hesaplayýnýz.
@@ -257,25 +228,24 @@ SORU 2. Calculate the total sales price by the Model Years
 TR - 2. Model Yýllarýna göre toplam satýþ miktarýný hesaplayýnýz.
 */
 
-SELECT Model_Year, SUM(total_sales_price) total_sales_price
-FROM sale.sales_summary
+SELECT	Model_Year, SUM(total_sales_price) total_sales_price
+FROM	sale.sales_summary
 GROUP BY Model_Year;
 
 
 -- SORU-3. Calculate the total sales amount by brand and model year.
 --TR - 3. Marka ve Model Yýlý kýrýlýmýnda toplam satýþ miktarýný hesaplayýnýz
 
-SELECT Brand, Model_Year, SUM(total_sales_price) total_sales_price
-FROM sale.sales_summary
+SELECT	Brand, Model_Year, SUM(total_sales_price) total_sales_price
+FROM	sale.sales_summary
 GROUP BY Brand, Model_Year;
 
 
 -- SORU 4. Calculate the total sales amount from all sales.
-
 -- TR - 4. Tüm satýþlardan elde edilen toplam satýþ tutarýný hesaplayýnýz:
 
-SELECT SUM(total_sales_price)
-FROM sale.sales_summary;
+SELECT	SUM(total_sales_price)
+FROM	sale.sales_summary;
 
 
 
@@ -302,12 +272,7 @@ GROUP BY
 ORDER BY 1,2;
 
 
----------////////////////////////----------
-
-
-
-
----------- ROLLUP ---------
+-----3 - ROLLUP -----------------------------------------------------------------------------------------------------------------
 
 --Generate different grouping variations that can be produced with the brand and Model_Year columns using 'ROLLUP'.
 -- Calculate sum total_sales_price
@@ -323,71 +288,68 @@ ORDER BY
 		1 DESC;
 
 
+------ 4- CUBE ------------------------------------------------------------------------------------------------------------------
 
-
-	-------////////////////////////----------
-
------------- CUBE ------------
+--CUBE operatörü, SELECT operatöründe belirtilen tüm alanlar için mümkün olan tüm kombinasyonlarý saðlar.
+--Sütunlarýn yazýlma sýrasý önemli DEÐÝLDÝR
 
 
 --Generate different grouping variations that can be produced with the brand and category columns using 'CUBE'.
--- Calculate sum total_sales_price
+--CUBE kullanarak marka ve kategori sütunlarý ile üretilebilecek farklý gruplama varyasyonlarý oluþturun
+--Calculate sum total_sales_price
 
 
 --brand, category, model_year sütunlarý için cube kullanarak total sales hesaplamasý yapýn.
-
 --üç sütun için 8 farklý gruplama varyasyonu oluþturulacak!
 
-SELECT Brand, Category, Model_Year, SUM(total_sales_price)
-FROM sale.sales_summary
+SELECT	Brand, Category, Model_Year, SUM(total_sales_price)
+FROM	sale.sales_summary
 GROUP BY 
 		CUBE (Brand, Category, Model_Year)
 ORDER BY Brand, Category;
 
 
+-----5 - PIVOT -----------------------------------------------------------------------------------------------------------------
+/*
+PÝVOT operatörü, sonuçlar tablosunda görülen benzersiz gözlemleri sütunlara dönüþtürür ve karþýlýk gelen toplam deðerleri satýrlar halinde belirler.
+PÝVOT operatöründe GROUP BY kullanýlmaz.
+-	Öncelikle pivotlamak için bir temel veri kümesi seçilir
+-	Oluþturulan yeni bir tablo(VIEW) veya ortak tablo ifadesi (CTE) kullanarak geçici bir sonuç oluþturulur
+-	Sonra PIVOT operatörü uygulanýr
+*/
 
-
------/////////////--------
-
-
---------- PIVOT ----------
-
---Generate a query that you use its result as basic table for PIVOT.
---pivot table oluþturacaðýnýz kaynak tabloyu belirleyin
-
--- that is what:
 
 --Question: Write a query using summary table that returns the total turnover from each category by model year. (in pivot table format)
 --kategorilere ve model yýlýna göre toplam ciro miktarýný summary tablosu üzerinden hesaplayýn
 
+--Sonucunu PIVOT için temel tablo olarak kullandýðýnýz bir sorgu oluþturun
+
+
 SELECT *
 FROM sale.sales_summary
 
+--Oluþturacaðýmýz tablo bunun sonucunda çýkan tablo fakat Create ederken Group by order sum gibi fonksiyonlarý çýkartýyoruz, bunlarý pivot yapacak
 SELECT Category, Model_Year, SUM(total_sales_price) total_turnover
 FROM sale.sales_summary
 GROUP BY Category, Model_Year
 ORDER BY 1,2;
 
-
-SELECT Category, Model_Year,total_sales_price
-FROM sale.sales_summary
-
-
+-- Çýkardýktan sonra bunu vreate edip yeni tablomuzu oluþturuyoruz
 CREATE VIEW v_category_model_turnover AS
 SELECT Category, Model_Year,total_sales_price
 FROM sale.sales_summary;
 
-select *
-from v_category_model_turnover
+SELECT	*
+FROM	v_category_model_turnover
 
+--Yukarýdaki sonucu pivot tabloya dönüþtür.
 
-SELECT *
-FROM v_category_model_turnover
-PIVOT
-(
-SUM(total_sales_price)
-FOR Model_Year
-IN ([2018], [2019], [2020], [2021])
+SELECT	*
+FROM	v_category_model_turnover
+	PIVOT (
+	SUM(total_sales_price)
+	FOR Model_Year
+	IN ([2018], [2019], [2020], [2021])
 ) AS PVT
 
 
@@ -396,21 +358,17 @@ IN ([2018], [2019], [2020], [2021])
 SELECT *
 FROM v_category_model_turnover
 
-
 SELECT Model_Year, total_sales_price 
 FROM v_category_model_turnover
 
-
-
 SELECT *
-FROM (
+FROM	(
 		SELECT Model_Year, total_sales_price FROM v_category_model_turnover
 		) A 
-PIVOT
-(
-SUM(total_sales_price)
-FOR Model_Year
-IN ([2018], [2019], [2020], [2021])
+	PIVOT (
+	SUM(total_sales_price)
+	FOR Model_Year
+	IN ([2018], [2019], [2020], [2021])
 ) AS PVT
 		
 
@@ -426,28 +384,29 @@ IN ([2018], [2019], [2020], [2021])
 ) AS PVT
 
 
-
-
-
---Now, you create a pivot table using above query result.
---Yukarýdaki sonucu pivot tabloya dönüþtür.
-
-
-
-
-
-
-
-
-
-	
---Write a query that returns count of the orders day by day in a pivot table format that has been shipped two days later.
 -- Ýki günden geç kargolanan sipariþlerin haftanýn günlerine göre daðýlýmýný hesaplayýnýz.
 
+SELECT *
+FROM (
+		SELECT DATENAME(DW, order_date) AS OrderDay,order_id
+		FROM sale.orders
+		WHERE DATEDIFF(DAY, order_date,shipped_date)>2
+) AS A
+PIVOT(
+COUNT(order_id)
+FOR OrderDay
+IN ([Monday],[Tuesday],[Wednesday],[Thursday],[Friday],[Saturday],[Sunday])
+) AS PVT
 
+---PIVOTSUZ ÇÖZÜM
 
-
-
-
-
-
+SELECT
+    COUNT(CASE WHEN DATENAME(dw, order_date)='Monday' THEN 1 END) AS Monday,
+	COUNT(CASE WHEN DATENAME(dw, order_date)='Tuesday' THEN 1 END) AS Tuesday,
+	COUNT(CASE WHEN DATENAME(dw, order_date)='Wednesday' THEN 1 END) AS Wednesday,
+	COUNT(CASE WHEN DATENAME(dw, order_date)='Thursday' THEN 1 END) AS Thursday,
+	COUNT(CASE WHEN DATENAME(dw, order_date)='Friday' THEN 1 END) AS Friday,
+	COUNT(CASE WHEN DATENAME(dw, order_date)='Saturday' THEN 1 END) AS Saturday,
+	COUNT(CASE WHEN DATENAME(dw, order_date)='Sunday' THEN 1 END) AS Sunday
+FROM sale.orders
+WHERE DATEDIFF(DAY, order_date,shipped_date)>2;
